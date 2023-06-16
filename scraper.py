@@ -9,7 +9,7 @@ def getTsvFilepath():
     global tsvFileName
     tsvFileName = filedialog.askopenfilename(initialdir = "./",
                                           title = "Select a File")
-    tsvLabel.configure(text="File Opened: "+tsvFileName)
+    tsvLabel.configure(text=tsvFileName)
     if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
         createButton.configure(state=ACTIVE)
 
@@ -17,7 +17,7 @@ def getMrpFilepath():
     global mrpFileName
     mrpFileName = filedialog.askopenfilename(initialdir = "./",
                                           title = "Select a File")
-    mrpLabel.configure(text="File Opened: "+mrpFileName)
+    mrpLabel.configure(text=mrpFileName)
     if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
         createButton.configure(state=ACTIVE)
 
@@ -29,7 +29,7 @@ def getOutputFilepath():
                                                         "*.xlsx"),
                                                        ("all files",
                                                         "*.*")))
-    outputLabel.configure(text="File Opened: "+outputFileName)
+    outputLabel.configure(text=outputFileName)
     if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
         createButton.configure(state=ACTIVE)
 
@@ -131,7 +131,7 @@ def main():
     tsvLabel = Label(tsvFrame,
                     text = "Please select a .tsv file with IMMI Projections",
                     width = 50, height = 1,
-                    fg = labelFG, bg = labelBG)
+                    fg = labelFG, bg = labelBG, anchor="w")
     
     tsvButton = Button(tsvFrame,
                         text = "Browse",
@@ -141,7 +141,7 @@ def main():
     mrpLabel = Label(mrpFrame,
                     text = "Please select an .xls file with MRP Projections",
                     width = 50, height = 1,
-                    fg = labelFG, bg = labelBG)
+                    fg = labelFG, bg = labelBG, anchor="w")
     
     mrpButton = Button(mrpFrame,
                        text="Browse",
@@ -151,7 +151,7 @@ def main():
     outputLabel = Label(outButFrame,
                     text = "Please select an .xlsx output file",
                     width = 50, height = 1,
-                    fg = labelFG, bg = labelBG)
+                    fg = labelFG, bg = labelBG, anchor="w")
 
     outputButton = Button(outButFrame,
                           text="Browse",
