@@ -3,32 +3,35 @@ import pandas as pd
 import csv
 from tkinter import *
 from tkinter import filedialog
-
+from PIL import Image, ImageTk
 
 def getTsvFilepath():
     global tsvFileName
     tsvFileName = filedialog.askopenfilename(initialdir = "./",
                                           title = "Select a File")
     tsvLabel.configure(text="File Opened: "+tsvFileName)
-
+    if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
+        createButton.configure(state=ACTIVE)
 
 def getMrpFilepath():
     global mrpFileName
     mrpFileName = filedialog.askopenfilename(initialdir = "./",
                                           title = "Select a File")
     mrpLabel.configure(text="File Opened: "+mrpFileName)
-    
-    
+    if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
+        createButton.configure(state=ACTIVE)
 
 def getOutputFilepath():
     global outputFileName
     outputFileName = filedialog.asksaveasfilename(initialdir = "./",
                                           title = "Select a File",
-                                          filetypes = (("Text files",
-                                                        "*.txt*"),
+                                          filetypes = (("Excel files",
+                                                        "*.xlsx"),
                                                        ("all files",
                                                         "*.*")))
     outputLabel.configure(text="File Opened: "+outputFileName)
+    if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
+        createButton.configure(state=ACTIVE)
 
 
 def processTsv():
@@ -90,58 +93,85 @@ def createForecast():
     with pd.ExcelWriter(outputFileName) as writer:
         immiSheet.to_excel(writer, sheet_name="IMMI", index=False)
         mrpSheet.to_excel(writer, sheet_name="Trimark", index=False)
+    window.destroy()
 
 
 def main():
+    global window
     window = Tk()
-    window.title('File Explorer')
-    window.geometry("500x500")
+    window.title('Projection Creator')
+    window.geometry("720x500")
     window.config(background = "white")
 
-    global tsvLabel, mrpLabel,outputLabel
-    tsvLabel = Label(window,
-                    text = "Please select a .tsv file with IMMI Projections",
-                    width = 50, height = 2,
-                    fg = "blue", bg= "white")
-    
-    mrpLabel = Label(window,
-                    text = "Please select an .xls file with MRP Projections",
-                    width = 50, height = 2,
-                    fg = "blue", bg="white")
-    
-    outputLabel = Label(window,
-                    text = "Please select an .xlsx output file",
-                    width = 50, height = 2,
-                    fg = "blue", bg="white")
-    
-    tsvButton = Button(window,
-                        text = "Browse for TSV file",
-                        command = getTsvFilepath)
-    
-    mrpButton = Button(window,
-                       text="Browse for MRP file",
-                       command=getMrpFilepath)
-    
-    outputButton = Button(window,
-                          text="Browse for Output file",
-                          command=getOutputFilepath)
-    
-    createButton = Button(window,
-                        text="Create Forecast",
-                        command=createForecast)
-    
-    exitButton = Button(window,
-                        text = "Exit",
-                        command = exit)
+    bannerFrame = Frame(window, bg="red")
+    inputFrame = Frame(window, bg="white")
+    outputFrame = Frame(window, bg="white")
+    tsvFrame = Frame(inputFrame,bg="white")
+    mrpFrame = Frame(inputFrame, bg="white")
+    outButFrame = Frame(outputFrame, bg="white")
+    createFrame = Frame(outputFrame, bg="white")
 
-    tsvLabel.grid(column = 1, row = 1)
-    tsvButton.grid(column = 1, row = 2)
-    mrpLabel.grid(column = 1, row = 3)
-    mrpButton.grid(column = 1, row = 4)
-    outputLabel.grid(column=1, row = 5)
-    outputButton.grid(column = 1, row = 6)
-    createButton.grid(column = 1, row = 7)
-    exitButton.grid(column = 1, row = 8)
+    bannerFrame.pack(side="top",fill="both",expand=True)
+    inputFrame.pack(fill="both",expand=True)
+    outputFrame.pack(side="bottom",fill="both",expand=True)
+    tsvFrame.pack(side="top", expand=True)
+    mrpFrame.pack(side="bottom",expand=True)
+    outButFrame.pack(side="top", expand=True)
+    createFrame.pack(side="bottom", expand=True)
+
+    img = ImageTk.PhotoImage(file = "pplogo.jpg")
+    imgLabel = Label(bannerFrame, image=img).pack(expand=True, fill="both", padx=0,pady=0)
+
+    labelBG = "#e0e0e0"
+    labelFG = "black"
+    buttonBG = "white"
+    buttonFG = "black"
+
+    global tsvLabel, mrpLabel,outputLabel, createButton
+    tsvLabel = Label(tsvFrame,
+                    text = "Please select a .tsv file with IMMI Projections",
+                    width = 50, height = 1,
+                    fg = labelFG, bg = labelBG)
+    
+    tsvButton = Button(tsvFrame,
+                        text = "Browse",
+                        command = getTsvFilepath,
+                        fg=buttonFG,bg=buttonBG,bd=0, highlightthickness=0)
+
+    mrpLabel = Label(mrpFrame,
+                    text = "Please select an .xls file with MRP Projections",
+                    width = 50, height = 1,
+                    fg = labelFG, bg = labelBG)
+    
+    mrpButton = Button(mrpFrame,
+                       text="Browse",
+                       command=getMrpFilepath,
+                       fg=buttonFG,bg=buttonBG,bd=0, highlightthickness=0)
+
+    outputLabel = Label(outButFrame,
+                    text = "Please select an .xlsx output file",
+                    width = 50, height = 1,
+                    fg = labelFG, bg = labelBG)
+
+    outputButton = Button(outButFrame,
+                          text="Browse",
+                          command=getOutputFilepath,
+                          fg=buttonFG,bg=buttonBG,bd=0, highlightthickness=0)
+    
+    createButton = Button(createFrame,
+                        text="Create Forecast",
+                        command=createForecast,
+                        fg=buttonFG,bg=buttonBG,state=DISABLED,bd=0,highlightthickness=0)
+
+
+    tsvLabel.pack(side="left",expand=True)
+    tsvButton.pack(side="right",expand=True)
+    mrpLabel.pack(side="left",expand=True)
+    mrpButton.pack(side="right",expand=True)
+    outputLabel.pack(side="left",expand=True)
+    outputButton.pack(side="right",expand=True)
+    createButton.pack(expand=True)
+    # exitButton.grid(  column = 1, row = 8)
 
     window.mainloop()
 
