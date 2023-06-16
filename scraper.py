@@ -6,7 +6,6 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 
 def getTsvFilepath():
-    global tsvFileName
     tsvFileName = filedialog.askopenfilename(initialdir = "./",
                                           title = "Select a File")
     tsvLabel.configure(text=tsvFileName)
@@ -14,7 +13,6 @@ def getTsvFilepath():
         createButton.configure(state=ACTIVE)
 
 def getMrpFilepath():
-    global mrpFileName
     mrpFileName = filedialog.askopenfilename(initialdir = "./",
                                           title = "Select a File")
     mrpLabel.configure(text=mrpFileName)
@@ -22,7 +20,6 @@ def getMrpFilepath():
         createButton.configure(state=ACTIVE)
 
 def getOutputFilepath():
-    global outputFileName
     outputFileName = filedialog.asksaveasfilename(initialdir = "./",
                                           title = "Select a File",
                                           filetypes = (("Excel files",
@@ -90,14 +87,22 @@ def processMrp():
 def createForecast():
     immiSheet = processTsv()
     mrpSheet = processMrp()
-    with pd.ExcelWriter(outputFileName) as writer:
-        immiSheet.to_excel(writer, sheet_name="IMMI", index=False)
-        mrpSheet.to_excel(writer, sheet_name="Trimark", index=False)
-    window.destroy()
+    try:
+        with pd.ExcelWriter(outputFileName) as writer:
+            immiSheet.to_excel(writer, sheet_name="IMMI", index=False)
+            mrpSheet.to_excel(writer, sheet_name="Trimark", index=False)
+            window.destroy()
+    except:
+        window.destroy()
+
+    # TODO: Add error checking that closes window on error
 
 
 def main():
-    global window
+    global window, tsvFileName, mrpFileName, outputFileName
+    tsvFileName = ""
+    mrpFileName = ""
+    outputFileName = ""
     window = Tk()
     window.title('Projection Creator')
     window.geometry("720x500")
