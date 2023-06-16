@@ -1,0 +1,1 @@
+.\python3\python.exe .\scraper.py %*
