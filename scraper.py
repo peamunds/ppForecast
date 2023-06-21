@@ -2,14 +2,20 @@ import pandas as pd
 import csv
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox
 from PIL import ImageTk
 
+tsvFileName = ""
+mrpFileName = ""
+outputFileName = ""
 
+# Checks fileName variables to see if createButton should be activated
 def activateCreateButton():
     global tsvFileName,mrpFileName,outputFileName
-    if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
+    if(tsvFileName and mrpFileName and outputFileName): # all paths aren't empty
         createButton.configure(state=ACTIVE)
 
+# Called by tsvButton to get and display its filename
 def getTsvFilepath():
     global tsvFileName
     tsvFileName = filedialog.askopenfilename(initialdir = "./",
@@ -18,6 +24,7 @@ def getTsvFilepath():
         tsvLabel.configure(text=tsvFileName)
     activateCreateButton()
 
+# Called by mrpButton to get and display its filename
 def getMrpFilepath():
     global mrpFileName
     mrpFileName = filedialog.askopenfilename(initialdir = "./",
@@ -26,6 +33,7 @@ def getMrpFilepath():
         mrpLabel.configure(text=mrpFileName)
     activateCreateButton()
 
+# Called by outputButton to save new file and display its name
 def getOutputFilepath():
     global outputFileName
     outputFileName = filedialog.asksaveasfilename(initialdir = "./",
@@ -38,7 +46,8 @@ def getOutputFilepath():
         outputLabel.configure(text=outputFileName)
     activateCreateButton()
 
-
+# transform data in TSV template to IMMI template DataFrame
+# returns formatted pd.DataFrame
 def processTsv():
     with open(tsvFileName) as fd:
         fileReader = csv.reader(fd,delimiter="\t")
@@ -63,13 +72,13 @@ def processTsv():
         
         for index, row in df.iterrows():
             item = row['Item']
-            buffer = int(row[flatHeaders[9]]) # existing buffer before months
+            buffer = int(row[flatHeaders[9]]) # existing buffer before month's quantity
             for header in flatHeaders[10:15]:
                 quant = 0
                 formattedHeader = header.replace("Month ","")
                 quant = int(row[header])
                 if quant != 0 and buffer != 0:
-                    if quant >= buffer:           # first order with buffer
+                    if quant >= buffer:         # account for buffer
                         quant = quant - buffer
                         buffer = 0
                         continue
@@ -86,7 +95,8 @@ def processTsv():
         immiDF.columns = ["Item", "Qty", "Date"]
     return immiDF
 
-
+# transform data in xls to Trimark format DataFrame
+# returns formatted pd.DataFrame
 def processMrp():
     temp = pd.read_excel(mrpFileName)
     mrpSheet = temp[["Part","PO Qty","Requested Date"]].copy()
@@ -94,26 +104,24 @@ def processMrp():
     mrpSheet['DATE_REQUIRED'] = mrpSheet['DATE_REQUIRED'].dt.strftime('%m/%d/%Y')
     return mrpSheet
 
-
+# Called by create button to write formatted data to outputFile
 def createForecast():
-    immiSheet = processTsv()
-    mrpSheet = processMrp()
     try:
+        immiSheet = processTsv()
+        mrpSheet = processMrp()
         with pd.ExcelWriter(outputFileName) as writer:
             immiSheet.to_excel(writer, sheet_name="IMMI", index=False)
             mrpSheet.to_excel(writer, sheet_name="Trimark", index=False)
             window.destroy()
-    except:
+    except UnicodeDecodeError or ValueError or KeyError:
+        messagebox.showerror("Wrong File Type!","One of the files you specified is not the correct file type!")
+    except Exception:
+        messagebox.showerror("Something Went Wrong!", "Please try again.")
         window.destroy()
-
-    # TODO: Add error checking that closes window on error
 
 
 def main():
-    global window, tsvFileName, mrpFileName, outputFileName
-    tsvFileName = ""
-    mrpFileName = ""
-    outputFileName = ""
+    global window
     window = Tk()
     window.title('Projection Creator')
     window.geometry("720x500")
@@ -187,7 +195,6 @@ def main():
     outputLabel.pack(side="left",expand=True)
     outputButton.pack(side="right",expand=True)
     createButton.pack(expand=True)
-    # exitButton.grid(  column = 1, row = 8)
     window.mainloop()
 
 if __name__ == "__main__":
