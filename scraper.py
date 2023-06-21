@@ -1,34 +1,42 @@
-import numpy as np
 import pandas as pd
 import csv
 from tkinter import *
 from tkinter import filedialog
-from PIL import Image, ImageTk
+from PIL import ImageTk
+
+
+def activateCreateButton():
+    global tsvFileName,mrpFileName,outputFileName
+    if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
+        createButton.configure(state=ACTIVE)
 
 def getTsvFilepath():
+    global tsvFileName
     tsvFileName = filedialog.askopenfilename(initialdir = "./",
                                           title = "Select a File")
-    tsvLabel.configure(text=tsvFileName)
-    if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
-        createButton.configure(state=ACTIVE)
+    if(tsvFileName):
+        tsvLabel.configure(text=tsvFileName)
+    activateCreateButton()
 
 def getMrpFilepath():
+    global mrpFileName
     mrpFileName = filedialog.askopenfilename(initialdir = "./",
                                           title = "Select a File")
-    mrpLabel.configure(text=mrpFileName)
-    if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
-        createButton.configure(state=ACTIVE)
+    if(mrpFileName):
+        mrpLabel.configure(text=mrpFileName)
+    activateCreateButton()
 
 def getOutputFilepath():
+    global outputFileName
     outputFileName = filedialog.asksaveasfilename(initialdir = "./",
                                           title = "Select a File",
                                           filetypes = (("Excel files",
                                                         "*.xlsx"),
                                                        ("all files",
                                                         "*.*")))
-    outputLabel.configure(text=outputFileName)
-    if(tsvFileName and mrpFileName and outputFileName): # unlock create button if all paths aren't empty
-        createButton.configure(state=ACTIVE)
+    if(outputFileName):
+        outputLabel.configure(text=outputFileName)
+    activateCreateButton()
 
 
 def processTsv():
@@ -80,7 +88,10 @@ def processTsv():
 
 
 def processMrp():
-    mrpSheet = pd.read_excel(mrpFileName)
+    temp = pd.read_excel(mrpFileName)
+    mrpSheet = temp[["Part","PO Qty","Requested Date"]].copy()
+    mrpSheet.columns = ["PRODUCT_ID","QTY","DATE_REQUIRED"]
+    mrpSheet['DATE_REQUIRED'] = mrpSheet['DATE_REQUIRED'].dt.strftime('%m/%d/%Y')
     return mrpSheet
 
 
@@ -177,7 +188,6 @@ def main():
     outputButton.pack(side="right",expand=True)
     createButton.pack(expand=True)
     # exitButton.grid(  column = 1, row = 8)
-
     window.mainloop()
 
 if __name__ == "__main__":
