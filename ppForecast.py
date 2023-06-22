@@ -127,7 +127,7 @@ def createForecast():
 def main():
     global window
     window = Tk()
-    window.title('Projection Creator')
+    window.title('Forecaster')
     window.geometry("720x500")
     window.config(background = "white")
 

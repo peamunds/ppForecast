@@ -1,2 +1,2 @@
 @echo off
-python %cd%\scraper.py
+python %cd%\ppForecast.py
