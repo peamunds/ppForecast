@@ -43,6 +43,8 @@ def getOutputFilepath():
                                                        ("all files",
                                                         "*.*")))
     if(outputFileName):
+        if(not outputFileName.endswith(".xlsx")):
+            outputFileName = outputFileName + ".xlsx"
         outputLabel.configure(text=outputFileName)
     activateCreateButton()
 
@@ -113,11 +115,13 @@ def createForecast():
             immiSheet.to_excel(writer, sheet_name="IMMI", index=False)
             mrpSheet.to_excel(writer, sheet_name="Trimark", index=False)
             window.destroy()
-    except UnicodeDecodeError or ValueError or KeyError:
+    except (UnicodeDecodeError, ValueError):
+        messagebox.showerror("Wrong File Type!","One of the files you specified is not the correct file type!")
+    except KeyError:  # you can only use tuples for error handling??
         messagebox.showerror("Wrong File Type!","One of the files you specified is not the correct file type!")
     except Exception:
-        messagebox.showerror("Something Went Wrong!", "Please try again.")
-        window.destroy()
+         messagebox.showerror("Something Went Wrong!", "Something went wrong.\n Please try again.")
+         window.destroy()
 
 
 def main():
@@ -144,7 +148,7 @@ def main():
     createFrame.pack(side="bottom", expand=True)
 
     img = ImageTk.PhotoImage(file = "pplogo.jpg")
-    imgLabel = Label(bannerFrame, image=img).pack(expand=True, fill="both", padx=0,pady=0)
+    imgLabel = Label(bannerFrame, image=img, bg="white").pack(expand=True, fill="both", padx=0,pady=0)
 
     labelBG = "#e0e0e0"
     labelFG = "black"
@@ -160,7 +164,7 @@ def main():
     tsvButton = Button(tsvFrame,
                         text = "Browse",
                         command = getTsvFilepath,
-                        fg=buttonFG,bg=buttonBG,bd=0, highlightthickness=0)
+                        fg=buttonFG,bg=buttonBG, highlightthickness=0)
 
     mrpLabel = Label(mrpFrame,
                     text = "Please select an .xls file with MRP Projections",
@@ -170,7 +174,7 @@ def main():
     mrpButton = Button(mrpFrame,
                        text="Browse",
                        command=getMrpFilepath,
-                       fg=buttonFG,bg=buttonBG,bd=0, highlightthickness=0)
+                       fg=buttonFG,bg=buttonBG, highlightthickness=0)
 
     outputLabel = Label(outButFrame,
                     text = "Please select an .xlsx output file",
@@ -180,13 +184,12 @@ def main():
     outputButton = Button(outButFrame,
                           text="Browse",
                           command=getOutputFilepath,
-                          fg=buttonFG,bg=buttonBG,bd=0, highlightthickness=0)
+                          fg=buttonFG,bg=buttonBG, highlightthickness=0)
     
     createButton = Button(createFrame,
                         text="Create Forecast",
                         command=createForecast,
-                        fg=buttonFG,bg=buttonBG,state=DISABLED,bd=0,highlightthickness=0)
-
+                        fg=buttonFG,bg=buttonBG,state=DISABLED,highlightthickness=0)
 
     tsvLabel.pack(side="left",expand=True)
     tsvButton.pack(side="right",expand=True)
