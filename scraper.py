@@ -147,7 +147,7 @@ def main():
     outButFrame.pack(side="top", expand=True)
     createFrame.pack(side="bottom", expand=True)
 
-    img = ImageTk.PhotoImage(file = "pplogo.jpg")
+    img = ImageTk.PhotoImage(file = "./bin/pplogo.jpg")
     imgLabel = Label(bannerFrame, image=img, bg="white").pack(expand=True, fill="both", padx=0,pady=0)
 
     labelBG = "#e0e0e0"
