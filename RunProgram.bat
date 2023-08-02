@@ -1,2 +1,2 @@
 @echo off
-python %cd%\ppForecast.py
+python "%cd%\bin\ppForecast.py"
