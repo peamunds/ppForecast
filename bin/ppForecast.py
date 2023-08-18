@@ -9,6 +9,11 @@ tsvFileName = ""
 mrpFileName = ""
 outputFileName = ""
 
+# makes path UNC format (//host/share/path) by replacing backslashes
+# path must be a string
+def convertFilePathToUNC(path):
+    return path.replace("\\","/")
+
 # Checks fileName variables to see if createButton should be activated
 def activateCreateButton():
     global tsvFileName,mrpFileName,outputFileName
@@ -22,6 +27,8 @@ def getTsvFilepath():
                                           title = "Select a File")
     if(tsvFileName):
         tsvLabel.configure(text=tsvFileName)
+    if(tsvFileName.startswith("\\")):  
+        tsvFileName = convertFilePathToUNC(tsvFileName)
     activateCreateButton()
 
 # Called by mrpButton to get and display its filename
@@ -31,6 +38,8 @@ def getMrpFilepath():
                                           title = "Select a File")
     if(mrpFileName):
         mrpLabel.configure(text=mrpFileName)
+    if(mrpFileName.startswith("\\")):  
+        mrpFileName = convertFilePathToUNC(mrpFileName)
     activateCreateButton()
 
 # Called by outputButton to save new file and display its name
@@ -46,6 +55,8 @@ def getOutputFilepath():
         if(not outputFileName.endswith(".xlsx")):
             outputFileName = outputFileName + ".xlsx"
         outputLabel.configure(text=outputFileName)
+    if(outputFileName.startswith("\\")):  
+        outputFileName = convertFilePathToUNC(outputFileName)
     activateCreateButton()
 
 # transform data in TSV template to IMMI template DataFrame
